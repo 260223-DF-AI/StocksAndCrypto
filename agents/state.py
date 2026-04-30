@@ -5,7 +5,8 @@ Defines the TypedDict that flows through the Supervisor StateGraph.
 All nodes read from and write to this shared state.
 """
 
-from typing import TypedDict
+from typing import TypedDict, Annotated
+import operator
 
 
 class ResearchState(TypedDict):
@@ -26,7 +27,7 @@ class ResearchState(TypedDict):
         user_id: Identifier for cross-thread memory via the Store interface.
     """
     question: str
-    plan: list[str]
+    plan: Annotated[list[str], operator.add]
     retrieved_chunks: list[dict]
     analysis: dict
     fact_check_report: dict
