@@ -1,0 +1,83 @@
+Introduction to Cryptocurrency
+A cryptocurrency is a digital or virtual currency that is meant to be a medium of exchange that does not have any physical manifestation. 
+Cryptography is used to verify transactions, secure transactions, and to manage the creation of new cryptocurrency units. 
+Cryptocurrency can be defined as a combination of cryptography and currency, as cryptocurrency extensively uses cryptographic programs
+to secure transactions between users.
+Since man evolved, currencies have been a very important part of our lives. 
+Earlier there was a barter system and it involved the exchange of goods and services among individuals. Later the barter system fell out, 
+as it had some glaring flaws such as no common measure of value. 
+Moreover, overcoming the drawbacks of the barter system and after several alterations in currencies, modern currency came into existence. 
+Modern currency includes paper currency, coins, credit cards, debit cards, and digital wallets such as amazon pay, apple pay, among others. 
+All of these are controlled by the banks and government, indicating centralized regulatory authority that delimits how paper currency and 
+credit card works. Due to technical failures or technical issues, online transactions using bank accounts are unsuccessful which is the 
+central point of failure, and the accounts may get hacked by DDOS attack or identity theft. 
+This indicates that the future of currency relies on cryptocurrency.
+Key Features of Cryptocurrency
+Cryptocurrency is a digital currency. Cryptography is used to secure transactions, verify transactions, 
+and control the creation of additional units. Mining is the process used to create units of cryptocurrency.
+Cryptocurrency is a virtual currency or digital currency that works as a medium of exchange. 
+In cryptocurrency, there is no limit to the fund transfer, no central point of failure, and cannot be hacked. 
+As of 2018, there are over 1600 cryptocurrencies available. Bitcoin, Litecoin, Ethereum, Z-cash are some of the popular cryptocurrencies. 
+There’s a limit to how many units of cryptocurrency can exist, with bitcoin, this limit exists at 21 million and after this, 
+no more bitcoins can be produced. The hashing algorithm is used by bitcoin that makes it easy for users to 
+determine whether a transaction is valid or not. Cryptocurrency works in a decentralized manner, hence companies or governments 
+cannot produce new units unless certain conditions are met. 
+Some of the features that make cryptocurrency special include no transaction costs, 24*7 access to money, 
+no limits on purchase and withdrawals, can be used by anyone, and faster international transactions are.
+Decentralization and Blockchain
+Cryptocurrencies are decentralized by a distributed network of devices across the world and these devices are known as nodes, 
+unlike centralized banking systems. Any individual with internet or weak-signal radio access can exchange valuables across continents easily. 
+Comparatively, cryptocurrency has a lower low cost than intercontinental bank transfers and the transactions are irreversible. 
+Whereas, in charge-bank (regular banking transactions), transactions are permitted by credit card companies. 
+The cryptocurrency algorithm network architecture is responsible to the determined management 
+and issuance of cryptocurrency units that are based on cryptographic proofs and programmed algorithms. 
+Protocols define how the cryptocurrency system operates, these can be considered as a pre-defined set of rules. 
+This means transactions take place directly without the need of a third-party intermediary and these cryptocurrencies 
+cannot be controlled by a single entity as they are decentralized. For instance, a Blockchain protocol operates on top of the Internet, 
+on a P2P network of computers that all run the protocol and hold an identical copy of the ledger of transactions, 
+enabling P2P value transactions without a middleman through machine consensus. 
+However, many cryptocurrencies are developed and managed by private foundations and companies, so there are varying degrees of decentralization. 
+For instance, companies such as Binance, Bitcoin.com, Bitpay, Bitstamp, Coindesk, Kraken, Blockstream, Blockchain.com, etc. 
+provide common services such as providing cryptocurrency wallets, bitcoin exchanges, payment service providers, and venture capital. 
+Depending on network structure and node distribution, some cryptocurrencies can be considered more decentralized than others. 
+Blockchain is the core component for most cryptocurrencies. It consists of a linear chain of multiple 
+linked blocks that are cryptographically secured. Each block a list of recent transactions and a reference to the block that came 
+immediately before it. A permanent record of all confirmed transactions, working as a decentralized digital ledger is maintained by Blockchain.
+Simply, computer files that store transaction data refers to the term block. 
+The Blockchain is termed as these blocks are arranged in a linear sequence that forms an endless chain of blocks. 
+All the data about blockchain transactions are collected, recorded, and stored inside these blocks, and every newly 
+generated block is connected to the previous one through the use of cryptographic techniques. 
+Moreover, this network is highly resistant to modification as this ledger is distributed across all the nodes in the network. 
+A cryptocurrency has a ledger, where all transactions are made public, hence total visibility is provided. 
+A ledger drives an individual to use fair transactions and reduces the risk of double-spending. 
+The ledger maintains a list of entries in a database and cannot be changed. This system is self-governed without 
+the interference of outside parties indicating that nobody owns the cryptocurrency blockchain or ledger.
+The first decentralized cryptocurrency ‘Bitcoin’ was created in 2009 by Satoshi Nakamoto. 
+The main idea was to create a decentralized and independent electronic payment system based on mathematical proofs and cryptography. 
+Like most cryptocurrencies, Bitcoin has a limited supply, which means that no more Bitcoins will be generated by the system after the 
+max supply is reached. The smallest unit of bitcoin cryptocurrency is satoshi. This was named after developer Satoshi Nakamoto, 
+the satoshi to bitcoin ratio is 100 million satoshi’s to one bitcoin. According to Jan Lansky, Cryptocurrency meets six states: 
+The overview of cryptocurrency units and their ownership is tracked by the system. The system does not require a central authority, 
+distributed achieve consensus on its state. The system defines if new cryptocurrency units can be created. 
+If new cryptocurrency units can be created, the system defines how to create new units, and how to determine the ownership of these new units. 
+The owner of a unit of cryptocurrency can transfer this unit. For this transfer to be successful, the current owner must prove the ownership. 
+Ownership of cryptocurrency units can be proved exclusively cryptographically. The system performs at most one of them if two different 
+instructions for changing the ownership of the same cryptographic units are entered at the same time. Crypto refers to cryptography. 
+Cryptography is a method of using encryption and decryption to secure communication in the presence of third parties. 
+Bitcoin is based on cryptography that uses computational algorithm such as SHA256, which is the hashing algorithm, 
+here two keys are used: a public key and private key, a public key is like a digital identity of the user that is 
+shared with everyone and a private key includes a digital signature of the user, which is hidden. 
+Private keys are stored in a cryptocurrency wallet. This could be in the application in a PC or smartphone or a hardware wallet. 
+To interact with this cryptocurrency, network wallets are used by users. Some of the most common cryptocurrencies are 
+Bitcoin – very first cryptocurrency, Ethereum – this currency lets the developer build different distributed technologies and 
+apps that wouldn’t work with bitcoin, Ripple – this currency does not use instead an iterative consensus process is implemented, 
+Bitcoin cash, NEM, Litecoin, IOTA, NEO, Dash uses a two-tier network transaction, Qtum, Monero, Ethereum classic, and others.
+Other Popular Cryptocurrencies
+Bitcoin is the most commonly traded cryptocurrency and was the first cryptocurrency developed the currency was developed by 
+Satoshi Nakamoto in 2009. As of May 2018, this had a market capitalization of around US$ 128 billion. Ethereum was developed in 2015, 
+in ethereum blockchain, ether is used as the currency token. This is the second most valuable and popular cryptocurrency. In May 2018, 
+the market capitalization of ether was around US$ 56 billion. Ripple was founded in 2012, which acts as both a digital payment network and a 
+cryptocurrency for financial transactions.
+In the current scenario of the economic system, the emergence of cryptocurrency has sparked an attraction about its future in bitcoin
+and other cryptocurrencies. This emergence aspires and inspires people to be a part of the trending mainstream financial system. 
+While the debate and challenges continue related to success and failure about cryptocurrencies fortune.
