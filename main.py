@@ -9,7 +9,7 @@ import argparse
 import os
 
 from dotenv import load_dotenv
-
+from agents.supervisor import build_supervisor_graph
 
 def parse_args() -> argparse.Namespace:
     """Parse command-line arguments."""
@@ -47,12 +47,19 @@ def main() -> None:
     load_dotenv()
     args = parse_args()
 
+    print("Starting")
+
     # TODO: Initialize the Supervisor StateGraph
+    graph = build_supervisor_graph()
     # TODO: Build the initial graph state from args
+    initial_state = {
+        "question": args.question
+    }
     # TODO: Invoke the graph and collect the final state
+    # final_state = graph.invoke(initial_state) # uncomment when you wanna run the graph
     # TODO: Pretty-print the structured research report
 
-    raise NotImplementedError("Wire up the Supervisor graph here.")
+    # raise NotImplementedError("Wire up the Supervisor graph here.")
 
 
 if __name__ == "__main__":
