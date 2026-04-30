@@ -6,11 +6,11 @@ the Planner, Retriever, Analyst, Fact-Checker, and Critique nodes.
 """
 
 from agents.state import ResearchState
-from langgraph.graph import StateGraph
+from langgraph.graph import StateGraph, START
 from agents.retriever import retriever_node
 from agents.analyst import analyst_node
 from agents.fact_checker import fact_checker_node
-from langchang.bedrock import ChatBedrock
+from langchain_aws import ChatBedrock
 
 def planner_node(state: ResearchState) -> dict:
     """
@@ -52,14 +52,14 @@ def router(state: ResearchState) -> str:
     - Inspect the current plan and state to choose the next node.
     - Return the node name as a string (used by add_conditional_edges).
     """
-    current_plan = state["plan"]
-    if "retrieve" in current_plan:
+    current_plan = state["plan"][-1]
+    if "retrieve" == current_plan:
         return "retriever"
-    elif "analyze" in current_plan:
+    elif "analyze" == current_plan:
         return "analyst"
-    elif "fact_check" in current_plan:
+    elif "fact_check" == current_plan:
         return "fact_checker"
-    elif "critique" in current_plan:
+    elif "critique" == current_plan:
         return "critique"
     else:
         raise ValueError("Router could not determine the next node based on the plan.")
@@ -105,20 +105,18 @@ def build_supervisor_graph():
     """
     workflow = StateGraph(ResearchState)    # instantiate stategraph with our ResearchState schema
 
-    workflow.add_node(planner_node, name="planner") # add planner node to the graph
-    workflow.add_node(retriever_node, name="retriever") # add retriever node to the graph
-    workflow.add_node(analyst_node, name="analyst") # add analyst node to the graph
-    workflow.add_node(fact_checker_node, name="fact_checker") # add fact checker node to the graph
-    workflow.add_node(critique_node, name="critique") # add critique node to the graph
+    workflow.add_node("planner", planner_node) # add planner node to the graph
+    workflow.add_node("retriever", retriever_node) # add retriever node to the graph
+    workflow.add_node("analyst", analyst_node) # add analyst node to the graph
+    workflow.add_node("fact_checker", fact_checker_node) # add fact checker node to the graph
+    workflow.add_node("critique", critique_node) # add critique node to the graph
 
-    workflow.add_conditional_edge("planner", "router", condition=lambda state: True) # always route to router
-    workflow.add_conditional_edge("router", "retriever", condition=lambda state: "retrieve" in state["plan"]) # if router decides we need to retrieve more info, route to retriever
-    workflow.add_conditional_edge("router", "analyst", condition=lambda state: "analyze" in state["plan"]) # if router decides we need to analyze, route to analyst
-    workflow.add_conditional_edge("router", "fact_checker", condition=lambda state: "fact_check" in state["plan"]) # if router decides we need to fact check, route to fact checker
-    workflow.add_conditional_edge("router", "critique", condition=lambda state: "critique" in state["plan"]) # if router decides we need to critique, route to critique
+    workflow.add_edge(START, "planner") # set entry point to planner
 
-    workflow.add_conditional_edge("critique", "planner", condition=lambda state: state["iteration_count"] < 3) # if critique decides to retry, route back to planner
-
-    workflow.set_entry_point("planner") # entry point to the graph
+    workflow.add_conditional_edges("planner", router) # add conditional edge from planner to router
+    workflow.add_conditional_edges("retriever", router) # add conditional edge from retriever to router
+    workflow.add_conditional_edges("analyst", router) # add conditional edge from analyst to router
+    workflow.add_conditional_edges("fact_checker", router) # add conditional edge from fact checker to router
+    workflow.add_conditional_edges("critique", router) # add conditional edge from critique to router
 
     return workflow.compile()
