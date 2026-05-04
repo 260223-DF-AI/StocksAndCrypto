@@ -56,9 +56,9 @@ def main() -> None:
         "question": args.question
     }
     # TODO: Invoke the graph and collect the final state
-    # final_state = graph.invoke(initial_state) # uncomment when you wanna run the graph
+    final_state = graph.invoke(initial_state) # uncomment when you wanna run the graph
     # TODO: Pretty-print the structured research report
-
+    print(final_state)
     # raise NotImplementedError("Wire up the Supervisor graph here.")
 
 

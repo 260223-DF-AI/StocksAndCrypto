@@ -10,7 +10,11 @@ from langgraph.graph import StateGraph, START
 from agents.retriever import retriever_node
 from agents.analyst import analyst_node
 from agents.fact_checker import fact_checker_node
-from langchain_aws import ChatBedrock
+from dotenv import load_dotenv
+#import os
+from openai import OpenAI
+load_dotenv()
+client = OpenAI()
 
 def planner_node(state: ResearchState) -> dict:
     """
@@ -21,13 +25,7 @@ def planner_node(state: ResearchState) -> dict:
     - Return a list of sub-tasks (Plan-and-Execute pattern).
     - Write to the scratchpad for observability.
     """
-    chat_model = ChatBedrock(
-        model_id = "anthropic.claude-3-haiku-20240307-v1:0",
-        region_name = "us-east-1",
-        model_kwargs = {
-            "temperature": 0.1
-        }
-    )
+
     prompt = f"""You are the Planner agent in a research workflow. 
     Your task is to analyze the question and decompose it into actionable sub-tasks.
     Return only a list of sub-tasks (Plan-and-Execute pattern).
@@ -38,9 +36,15 @@ def planner_node(state: ResearchState) -> dict:
     - critique: evaluate and refine the response
     Question: {state["question"]}
     """
-    plan = chat_model(prompt)
+    response = client.responses.create(
+        model="gpt-5-nano",
+        input=prompt)
+    #plan = chat_model.invoke(prompt)
+    plan = response
     state["plan"] = plan
-    state["scratchpad"].append(f"Plan: {plan}")
+    print(plan)
+    #state["scratchpad"].append(f"Plan: {plan}")
+    #print(plan)
     return {"plan": plan}
 
 

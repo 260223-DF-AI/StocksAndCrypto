@@ -6,13 +6,17 @@ applies context compression and re-ranking, and returns
 structured retrieval results to the Supervisor.
 """
 
+from langchain_core.documents import Document
 from agents.state import ResearchState
 from sentence_transformers import CrossEncoder
 from pinecone import Pinecone
 import os
 from scripts.ingest import generate_embeddings
+from dotenv import load_dotenv
+load_dotenv()
 
-reranker = CrossEncoder("cross-encoder/msmarco-MiniLM-L-6-v2")
+
+#reranker = CrossEncoder("cross-encoder/msmarco-MiniLM-L-6-v2")
 
 api_key = os.getenv("PINECONE_API_KEY")
 index_name = os.getenv("PINECONE_INDEX_NAME")
@@ -39,11 +43,17 @@ def retriever_node(state: ResearchState) -> dict:
     current_task = state["plan"][0]
 
     # --- 2. Embed query ---
-    query_embedding = generate_embeddings(current_task)
+    doc = [Document(page_content=current_task)]
+    query_embedding = generate_embeddings(doc)
 
+
+    index = pc.Index(index_name)
     # --- 3. Query Pinecone ---
-    results = index_name.query(
-        vector=query_embedding,
+
+    vector = query_embedding[0]["values"]
+
+    results = index.query(
+        vector=vector,
         top_k=10,
         include_metadata=True
     )
@@ -62,32 +72,29 @@ def retriever_node(state: ResearchState) -> dict:
             "page_number": metadata.get("page_number", None)
         })
 
-    # # --- 5. Context compression ---
-    # for chunk in chunks:
-    #     chunk["content"] = compress_text(chunk["content"])
 
     # --- 6. Re-ranking (Cross Encoder) ---
-    if chunks:
-        pairs = [(current_task, chunk["content"]) for chunk in chunks]
-        rerank_scores = reranker.predict(pairs)
+    # if chunks:
+    #     pairs = [(current_task, chunk["content"]) for chunk in chunks]
+    #     rerank_scores = reranker.predict(pairs)
 
-        for chunk, score in zip(chunks, rerank_scores):
-            chunk["relevance_score"] = float(score)
+    #     for chunk, score in zip(chunks, rerank_scores):
+    #         chunk["relevance_score"] = float(score)
 
-        # Sort by reranked score
-        chunks = sorted(chunks, key=lambda x: x["relevance_score"], reverse=True)
+    #     # Sort by reranked score
+    #     chunks = sorted(chunks, key=lambda x: x["relevance_score"], reverse=True)
 
     # --- 7. Keep top N ---
     top_chunks = chunks[:5]
 
     # --- 8. Logging ---
-    state["scratchpad"].append(
-        f"[Retriever] Task: {current_task} | Retrieved: {len(top_chunks)} chunks"
-    )
+    # state["scratchpad"].append(
+    #     f"[Retriever] Task: {current_task} | Retrieved: {len(top_chunks)} chunks"
+    # )
 
     # --- 9. Return updated state ---
     return {
         "retrieved_chunks": top_chunks,
-        "scratchpad": state["scratchpad"]
+        #"scratchpad": state["scratchpad"]
     }
 
