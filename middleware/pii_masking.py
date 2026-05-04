@@ -17,12 +17,14 @@ PII_PATTERNS: dict[str, str] = {
 
 
 def mask_pii(text: str) -> str:
-    """
-    Replace detected PII patterns with redaction placeholders.
+    """Replace detected PII patterns with redaction placeholders.
 
-    TODO:
-    - Iterate over PII_PATTERNS and apply re.sub.
-    - Return the sanitized text.
-    - Consider logging redaction counts to the scratchpad.
+    Returns a string of the same shape with each match swapped for a
+    typed redaction token like [REDACTED_EMAIL] / [REDACTED_PHONE].
     """
-    raise NotImplementedError
+    if not text:
+        return text
+    redacted = text
+    for label, pattern in PII_PATTERNS.items():
+        redacted = re.sub(pattern, f"[REDACTED_{label.upper()}]", redacted)
+    return redacted
