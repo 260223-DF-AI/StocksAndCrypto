@@ -10,7 +10,7 @@ from agents.state import ResearchState
 from langgraph.graph import StateGraph, START, END
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.errors import NodeInterrupt
-from langchain_aws import ChatBedrock
+#from langchain_aws import ChatBedrock
 from langchain_core.prompts import ChatPromptTemplate
 from pydantic import BaseModel, Field
 
@@ -18,11 +18,18 @@ from agents.retriever import retriever_node
 from agents.analyst import analyst_node
 from agents.fact_checker import fact_checker_node
 
+from openai import OpenAI
+
 from memory.store import (
     get_user_preferences,
     get_query_history,
     append_query
 )
+from dotenv import load_dotenv
+
+load_dotenv()
+
+client = OpenAI()
 
 class _Plan(BaseModel):
     """Structured output schema for the planner."""
@@ -60,28 +67,77 @@ def planner_node(state: ResearchState) -> dict:
     prefs = get_user_preferences(user_id)
     history = get_query_history(user_id, limit = 3)
     append_query(user_id, state["question"])
-    chat_model = ChatBedrock(
-        model_id = os.environ["BEDROCK_MODEL_ID"],
-        region_name = os.environ["AWS_REGION"],
-        model_kwargs = {
-            "max_tokens": 512,
-            "temperature": 0.0
-        }
-    )
-    
-    setup = _Planner_Prompt | chat_model.with_structured_output(_Plan)
-    plan = setup.invoke({
-        "question": state["question"],
-        "preferences": prefs,
-        "history": history or ["<none>"]
-    })
 
+    # chat_model = ChatBedrock(
+    #     model_id = os.environ["BEDROCK_MODEL_ID"],
+    #     region_name = os.environ["AWS_REGION"],
+    #     model_kwargs = {
+    #         "max_tokens": 512,
+    #         "temperature": 0.0
+    #     }
+    # )
+    
+    # setup = _Planner_Prompt | chat_model.with_structured_output(_Plan)
+    # plan = setup.invoke({
+    #     "question": state["question"],
+    #     "preferences": prefs,
+    #     "history": history or ["<none>"]
+    # })
+    
+    """
+            You decompose research questions into 1-4 ordered, independently-
+            answerable sub-tasks. Prefer fewer, larger sub-tasks over many tiny
+            ones. Each sub-task should be answerable from a single retrieval.\n\n
+            Output schema: return JSON with a single key 'subtasks' whose value is
+            a JSON array of strings. Never return a single concatenated string."
+            
+            User preferences: {prefs}\n"
+            Recent past questions from this user: {history}\n\n"
+            New question: {state['question']}\n\n"
+
+            Return an ordered JSON array of sub-task strings (1-4 entries).
+            Each element MUST be a string. Do NOT return a single concatenated string.
+            Return the sub-tasks as a JSON list of strings."
+        """
+    
+    plan = client.responses.create(
+        model="gpt-5-nano",
+        input=        
+        """
+            You decompose research questions into ordered independently executable sub-tasks.
+            Based on the user's question, return a list of sub-tasks (Plan-and-Execute pattern).
+            
+            These are the sub-tasks that you have access to:
+            retriever: get relevant embeddings from a Pinecone index\n
+            analyst: provide a detailed response based on retrieved chunks and question\n
+            fact_checker: validate the analyst's response is factually correct\n
+
+            Output: a list of sub-tasks as a JSON array of strings.
+            
+            Example Output:
+            Question: "How often will a single person mine a block of Bitcoin?"
+
+            Output:
+            "{
+                {retriever: the process of mining a block}, 
+                {retriever: bitcoin},
+                {analyst},
+                {fact_checker},
+                {critique}
+            }"
+            
+            Question:
+        """
+        + state["question"]
+        )
+    print(plan)
+    print(plan.output[1].content[0].text)
     return {
-        "plan": plan.subtasks,
+        "plan": plan.output[1].content[0].text,
         "current_sub_task_idx": 0,
         "iteration_count": 0,
         "hitl": False,
-        "scratchpad": [f"[planner] decomposed into {len(plan.subtasks)} sub-tasks"]
+        "scratchpad": [f"[planner] decomposed into {len(plan.output[1].content[0].text)} sub-tasks"]
     }
 
 
