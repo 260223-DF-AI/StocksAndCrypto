@@ -50,6 +50,7 @@ def planner_node(state: ResearchState) -> dict:
 
     llm = ChatBedrock(
         model_id=os.environ["BEDROCK_MODEL_ID"],
+        provider="anthropic",
         region_name=os.environ["AWS_REGION"],
         model_kwargs={"max_tokens": 512, "temperature": 0.0},
     )

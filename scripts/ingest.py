@@ -17,8 +17,7 @@ from pathlib import Path
 from langchain_aws import BedrockEmbeddings
 from langchain_community.document_loaders import PyPDFLoader, TextLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from pinecone import Pinecone
-
+from pinecone import Pinecone, ServerlessSpec
 from dotenv import load_dotenv
 
 
@@ -126,7 +125,15 @@ def generate_embeddings(chunks: list) -> list:
 def upsert_to_pinecone(embeddings: list, namespace: str) -> None:
     """Upsert in batches of 100 — Pinecone's recommended cap per request."""
     pc = Pinecone(api_key=os.environ["PINECONE_API_KEY"])
-    index = pc.Index(os.environ["PINECONE_INDEX_NAME"])
+    index_name = os.environ["PINECONE_INDEX_NAME"]
+    if not pc.has_index(index_name):
+        pc.create_index(
+        name = index_name,
+        dimension = 1024,
+        metric = "cosine",
+        spec=ServerlessSpec(cloud="aws", region="us-east-1")
+        )
+    index = pc.Index(index_name)
 
     BATCH = 100
     for start in range(0, len(embeddings), BATCH):

@@ -84,6 +84,7 @@ def analyst_node(state: ResearchState) -> dict:
     # ChatBedrock + structured output — the LLM is forced into AnalysisResult.
     llm = ChatBedrock(
         model_id=os.environ["BEDROCK_MODEL_ID"],
+        provider="anthropic",
         region_name=os.environ["AWS_REGION"],
         model_kwargs={"max_tokens": 1024, "temperature": 0.2},
     )
