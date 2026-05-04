@@ -4,17 +4,20 @@ ResearchFlow — Supervisor Graph
 Builds and returns the main LangGraph StateGraph that orchestrates
 the Planner, Retriever, Analyst, Fact-Checker, and Critique nodes.
 """
+import os
 
 from agents.state import ResearchState
-from langgraph.graph import StateGraph, START
+from langgraph.graph import StateGraph, START, END
+from langgraph.checkpoint.memory import MemorySaver
+from langgraph.errors import NodeInterrupt
+#from langchain_aws import ChatBedrock
+from langchain_core.prompts import ChatPromptTemplate
+from pydantic import BaseModel, Field
+
 from agents.retriever import retriever_node
 from agents.analyst import analyst_node
 from agents.fact_checker import fact_checker_node
-from dotenv import load_dotenv
-#import os
-from openai import OpenAI
-load_dotenv()
-client = OpenAI()
+from langchain_aws import ChatBedrock
 
 def planner_node(state: ResearchState) -> dict:
     """
@@ -25,27 +28,82 @@ def planner_node(state: ResearchState) -> dict:
     - Return a list of sub-tasks (Plan-and-Execute pattern).
     - Write to the scratchpad for observability.
     """
+    user_id = state.get("user_id", "default")
+    prefs = get_user_preferences(user_id)
+    history = get_query_history(user_id, limit = 3)
+    append_query(user_id, state["question"])
 
-    prompt = f"""You are the Planner agent in a research workflow. 
-    Your task is to analyze the question and decompose it into actionable sub-tasks.
-    Return only a list of sub-tasks (Plan-and-Execute pattern).
-    These are the actions that can be in the list of sub-tasks:
-    - retrieve: gather more information or data
-    - analyze: perform analysis or synthesis on the retrieved information
-    - fact_check: verify claims against trusted sources
-    - critique: evaluate and refine the response
-    Question: {state["question"]}
+    # chat_model = ChatBedrock(
+    #     model_id = os.environ["BEDROCK_MODEL_ID"],
+    #     region_name = os.environ["AWS_REGION"],
+    #     model_kwargs = {
+    #         "max_tokens": 512,
+    #         "temperature": 0.0
+    #     }
+    # )
+    
+    # setup = _Planner_Prompt | chat_model.with_structured_output(_Plan)
+    # plan = setup.invoke({
+    #     "question": state["question"],
+    #     "preferences": prefs,
+    #     "history": history or ["<none>"]
+    # })
+    
     """
-    response = client.responses.create(
+            You decompose research questions into 1-4 ordered, independently-
+            answerable sub-tasks. Prefer fewer, larger sub-tasks over many tiny
+            ones. Each sub-task should be answerable from a single retrieval.\n\n
+            Output schema: return JSON with a single key 'subtasks' whose value is
+            a JSON array of strings. Never return a single concatenated string."
+            
+            User preferences: {prefs}\n"
+            Recent past questions from this user: {history}\n\n"
+            New question: {state['question']}\n\n"
+
+            Return an ordered JSON array of sub-task strings (1-4 entries).
+            Each element MUST be a string. Do NOT return a single concatenated string.
+            Return the sub-tasks as a JSON list of strings."
+        """
+    
+    plan = client.responses.create(
         model="gpt-5-nano",
-        input=prompt)
-    #plan = chat_model.invoke(prompt)
-    plan = response
-    state["plan"] = plan
+        input=        
+        """
+            You decompose research questions into ordered independently executable sub-tasks.
+            Based on the user's question, return a list of sub-tasks (Plan-and-Execute pattern).
+            
+            These are the sub-tasks that you have access to:
+            retriever: get relevant embeddings from a Pinecone index\n
+            analyst: provide a detailed response based on retrieved chunks and question\n
+            fact_checker: validate the analyst's response is factually correct\n
+
+            Output: a list of sub-tasks as a JSON array of strings.
+            
+            Example Output:
+            Question: "How often will a single person mine a block of Bitcoin?"
+
+            Output:
+            "{
+                {retriever: the process of mining a block}, 
+                {retriever: bitcoin},
+                {analyst},
+                {fact_checker},
+                {critique}
+            }"
+            
+            Question:
+        """
+        + state["question"]
+        )
     print(plan)
-    #state["scratchpad"].append(f"Plan: {plan}")
-    #print(plan)
-    return {"plan": plan}
+    print(plan.output[1].content[0].text)
+    return {
+        "plan": plan.output[1].content[0].text,
+        "current_sub_task_idx": 0,
+        "iteration_count": 0,
+        "hitl": False,
+        "scratchpad": [f"[planner] decomposed into {len(plan.output[1].content[0].text)} sub-tasks"]
+    }
 
 
 def router(state: ResearchState) -> str:
@@ -56,17 +114,13 @@ def router(state: ResearchState) -> str:
     - Inspect the current plan and state to choose the next node.
     - Return the node name as a string (used by add_conditional_edges).
     """
-    current_plan = state["plan"][-1]
-    if "retrieve" == current_plan:
+    if not state.get("retrieved_chunks"):
         return "retriever"
-    elif "analyze" == current_plan:
+    if not state.get("analysis"):
         return "analyst"
-    elif "fact_check" == current_plan:
+    if not state.get("fact_check_report"):
         return "fact_checker"
-    elif "critique" == current_plan:
-        return "critique"
-    else:
-        raise ValueError("Router could not determine the next node based on the plan.")
+    return "critique"
 
 
 def critique_node(state: ResearchState) -> dict:
@@ -80,18 +134,43 @@ def critique_node(state: ResearchState) -> dict:
     - If above threshold, accept and route to END.
     - Increment iteration_count.
     """
-    confidence_threshold = 0.7
-    max_iterations = 3
-    if state["confidence_score"] < confidence_threshold:
-        if state["iteration_count"] < max_iterations:
-            state["iteration_count"] += 1
-            return "planner"  # route back to planner for refinement
-        else:
-            raise Exception("HITL Interrupt: Confidence below threshold after max iterations.")
-    else:
-        state["iteration_count"] += 1
-        return "end"
+    iteration = state.get("iteration_count", 0) + 1
+    confidence_threshold = state.get("confidence_score", 0.0)
+    threshold = float(os.environ.get("HITL_CONFIDENCE_THRESHOLD", 0.6))
+    max_iterations = int(os.environ.get("MAX_REFINEMENT_ITERATIONS", 3))
 
+    # Path 1: confident enough, can accept
+    log = [f"[critique] iter={iteration}, confidence={confidence_threshold:.2f},"
+           f"threshold={threshold}, max_iter={max_iterations}"]
+    if confidence_threshold >= threshold and not state.get("hitl"):
+        log.append("[critique] accepted")
+        return {"iteration_count": iteration, "scratchpad": log}
+    
+    #Path 2: budget exhausted, escalate
+    if iteration >= max_iterations:
+        log.append("[critique] max iterations reached, HITL triggered")
+        raise NodeInterrupt(
+            f"Confidence {confidence:.2f} below threshold {threshold}"
+            f"after {iteration} iterations. Human review required."
+        )
+    
+    # Path 3: retry, clear downstream state so the router re-runs
+    log.append("[critique] retrying - clearing analysis & fact check")
+    return {
+        "iteration_count": iteration,
+        "retrieved_chunks": [],
+        "analysis": {},
+        "fact_check_report": {},
+        "scratchpad": log
+    }
+
+def _critique_router(state: ResearchState) -> str:
+    """Edge after critique_node, END if accepted, otherwise loop."""
+    confidence = state.get("confidence_score", 0.0)
+    threshold = float(os.environ.get("HITL_CONFIDENCE_THRESHOLD", 0.6))
+    if confidence >= threshold and not state.get("hitl"):
+        return END
+    return "retriever"
 
 def build_supervisor_graph():
     """
@@ -117,10 +196,20 @@ def build_supervisor_graph():
 
     workflow.add_edge(START, "planner") # set entry point to planner
 
-    workflow.add_conditional_edges("planner", router) # add conditional edge from planner to router
-    workflow.add_conditional_edges("retriever", router) # add conditional edge from retriever to router
-    workflow.add_conditional_edges("analyst", router) # add conditional edge from analyst to router
-    workflow.add_conditional_edges("fact_checker", router) # add conditional edge from fact checker to router
-    workflow.add_conditional_edges("critique", router) # add conditional edge from critique to router
+    # Router will pick which specialist is needed
+    workflow.add_conditional_edges(
+        "planner", router,
+        {"retriever": "retriever", "analyst": "analyst",
+        "fact_checker": "fact_checker", "critique": "critique"}
+    )
+    workflow.add_edge("retriever", "analyst")
+    workflow.add_edge("analyst", "fact_checker")
+    workflow.add_edge("fact_checker", "critique")
 
-    return workflow.compile()
+    # Critique will be the decider for ending or looping
+    workflow.add_conditional_edges(
+        "critique", critique_node,
+        {"retriever": "retriever", END: END}
+    )
+
+    return workflow.compile(checkpointer=MemorySaver())

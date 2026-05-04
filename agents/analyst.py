@@ -27,6 +27,13 @@ class AnalysisResult(BaseModel):
     citations: list[Citation]
     confidence: float  # 0.0 – 1.0
 
+def format_chunks(chunks: list[dict]) -> str:
+    """Render retrieved chunks into a numbered, citable block."""
+    lines = []
+    for i, c in enumerate(chunks, start = 1):
+        page = f", p.{c['page_number']}" if c.get("page_number") else ""
+        lines.append(f"[{i}] (source: {c['source']}{page})\n{c['content']}")
+    return "\n\n".join(lines)
 
 # ---------------------------------------------------------------------------
 # Agent Node

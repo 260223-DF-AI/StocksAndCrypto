@@ -6,7 +6,7 @@ All nodes read from and write to this shared state.
 """
 
 from typing import TypedDict, Annotated
-import operator
+from operator import add
 
 
 class ResearchState(TypedDict):
@@ -27,11 +27,13 @@ class ResearchState(TypedDict):
         user_id: Identifier for cross-thread memory via the Store interface.
     """
     question: str
-    plan: Annotated[list[str], operator.add]
+    user_id: str
+    plan: list[str]
+    current_sub_plan_idx: int
     retrieved_chunks: list[dict]
     analysis: dict
     fact_check_report: dict
     confidence_score: float
     iteration_count: int
-    scratchpad: list[str]
-    user_id: str
+    hitl: bool  # true -> critique routes to HITL interrupt
+    scratchpad: Annotated[list[str], add]

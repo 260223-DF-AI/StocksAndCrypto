@@ -8,6 +8,9 @@ a research question against the ingested document corpus.
 import argparse
 import os
 
+import uuid
+import json
+
 from dotenv import load_dotenv
 from agents.supervisor import build_supervisor_graph
 
@@ -51,12 +54,16 @@ def main() -> None:
 
     # TODO: Initialize the Supervisor StateGraph
     graph = build_supervisor_graph()
+    thread_id = f"cli-{uuid.uuid4()}"
+    config = {"configurable": {"thread_id": thread_id}}
+
     # TODO: Build the initial graph state from args
     initial_state = {
-        "question": args.question
+        "question": args.question,
+        "user_id": args.user_id
     }
     # TODO: Invoke the graph and collect the final state
-    final_state = graph.invoke(initial_state) # uncomment when you wanna run the graph
+    final_state = graph.invoke(initial_state, config=config) # uncomment when you wanna run the graph
     # TODO: Pretty-print the structured research report
     print(final_state)
     # raise NotImplementedError("Wire up the Supervisor graph here.")
