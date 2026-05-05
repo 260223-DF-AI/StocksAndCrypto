@@ -13,5 +13,69 @@
       "Passage from document A that discusses X...",
       "Passage from document B that discusses Y..."
     ]
+  },
+  {
+    "question": "What are the primary differences between X and Y?",
+    "ground_truth_answer": "X differs from Y in three key ways: ...",
+    "ground_truth_contexts": [
+      "Passage from document A that discusses X...",
+      "Passage from document B that discusses Y..."
+    ]
+  },
+  {
+    "question": "What are the primary differences between X and Y?",
+    "ground_truth_answer": "X differs from Y in three key ways: ...",
+    "ground_truth_contexts": [
+      "Passage from document A that discusses X...",
+      "Passage from document B that discusses Y..."
+    ]
+  },
+  {
+    "question": "What are the primary differences between X and Y?",
+    "ground_truth_answer": "X differs from Y in three key ways: ...",
+    "ground_truth_contexts": [
+      "Passage from document A that discusses X...",
+      "Passage from document B that discusses Y..."
+    ]
+  },
+  {
+    "question": "What are the primary differences between X and Y?",
+    "ground_truth_answer": "X differs from Y in three key ways: ...",
+    "ground_truth_contexts": [
+      "Passage from document A that discusses X...",
+      "Passage from document B that discusses Y..."
+    ]
+  },
+  {
+    "question": "What are the primary differences between X and Y?",
+    "ground_truth_answer": "X differs from Y in three key ways: ...",
+    "ground_truth_contexts": [
+      "Passage from document A that discusses X...",
+      "Passage from document B that discusses Y..."
+    ]
+  },
+  {
+    "question": "What are the primary differences between X and Y?",
+    "ground_truth_answer": "X differs from Y in three key ways: ...",
+    "ground_truth_contexts": [
+      "Passage from document A that discusses X...",
+      "Passage from document B that discusses Y..."
+    ]
+  },
+  {
+    "question": "What are the primary differences between X and Y?",
+    "ground_truth_answer": "X differs from Y in three key ways: ...",
+    "ground_truth_contexts": [
+      "Passage from document A that discusses X...",
+      "Passage from document B that discusses Y..."
+    ]
+  },
+  {
+    "question": "What are the primary differences between X and Y?",
+    "ground_truth_answer": "X differs from Y in three key ways: ...",
+    "ground_truth_contexts": [
+      "Passage from document A that discusses X...",
+      "Passage from document B that discusses Y..."
+    ]
   }
 ]
