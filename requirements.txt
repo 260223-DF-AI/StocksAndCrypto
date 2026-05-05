@@ -34,3 +34,6 @@ pytest>=8.0.0
 
 # Linting (optional — see NFR-4)
 ruff>=0.5.0
+
+# cohere for reranking
+cohere>=5.0.0

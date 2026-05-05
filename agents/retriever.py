@@ -1,9 +1,15 @@
 import os
+from dotenv import load_dotenv
 
+import boto3
 from langchain_aws import BedrockEmbeddings
 from pinecone import Pinecone
+import cohere
 
 from agents.state import ResearchState
+
+load_dotenv()
+
 
 # Module-level singletons, lazily constructed on first use. Lazy init matters:
 # both clients read env vars at construction time, so eager init at import time
@@ -11,6 +17,7 @@ from agents.state import ResearchState
 # and PINECONE_API_KEY set *before* `from agents.retriever import ...` runs.
 _embedder = None
 _pinecone_index = None
+_bedrock_runtime = None
 
 
 def _get_embedder():
@@ -32,6 +39,15 @@ def _get_index():
         _pinecone_index = pc.Index(os.environ["PINECONE_INDEX_NAME"])
     return _pinecone_index
 
+def _get_bedrock_runtime():
+    """Lazy-init so unit tests can monkeypatch before first call."""
+    global _bedrock_runtime
+    if _bedrock_runtime is None:
+        _bedrock_runtime = boto3.client(
+            "bedrock-runtime",
+            region_name = os.environ["AWS_REGION"]
+        )
+    return _bedrock_runtime
 
 def _cos_sim(a: list[float], b: list[float]) -> float:
     """Cosine similarity for plain Python lists — avoids a numpy import."""
@@ -58,6 +74,39 @@ def _compress(chunk_text: str, query: str, max_sentences: int = 4) -> str:
     top.sort()                                      # preserve original order
     return ". ".join(sentences[i] for i in top)
 
+def _rerank_matches(query: str, matches: list[dict], top_k: int = 5) -> list[dict]:
+    """Rerank Pinecone matches using Bedrock Cohere rerank."""
+    co = cohere.Client(api_key = os.environ["COHERE_API_KEY"])
+    if not matches:
+        return []
+    
+    documents = [match.get("metadata", {}).get("content", "") for match in matches]
+
+    rankings = co.rerank(
+        model = os.environ["COHERE_RERANK_MODEL"],
+        query = query,
+        documents = documents,
+        top_n = min(top_k, len(documents))
+    )
+
+    results = rankings.results
+    if not results:
+        return matches[:top_k]
+    
+    reranked = []
+    for r in results[:top_k]:
+        index = r.index
+        score = r.relevance_score
+        if index is None or index < 0 or index >= len(matches):
+            continue
+        match = matches[index]
+        try:
+            match["rerank_score"] = float(score) if score is not None else None
+        except Exception:
+            match["rerank_score"] = None
+        reranked.append(match)
+
+    return reranked or matches[:top_k]
 
 def retriever_node(state: ResearchState) -> dict:
     """Retrieve and compress."""
@@ -81,7 +130,14 @@ def retriever_node(state: ResearchState) -> dict:
     if not matches:
         return {"retrieved_chunks": [], "scratchpad": log + ["[retriever] no matches"]}
 
-    # 2) compress + structure ------------------------------------------------
+    # 2) rerank with Cohere --------------------------------------------------
+    try:
+        matches = _rerank_matches(sub_task, matches, top_k = 5)
+        log.append(f"[retriever] reranked candidates with Cohere")
+    except Exception as e:
+        log.append(f"[retriever] reranking failed: {e}")
+
+    # 3) compress + structure ------------------------------------------------
     # Pinecone returns matches sorted by cosine score; take top 5.
     chunks = []
     for match in matches[:5]:
@@ -92,5 +148,4 @@ def retriever_node(state: ResearchState) -> dict:
             "source": meta.get("source", "unknown"),
             "page_number": meta.get("page_number"),
         })
-    log.append(f"[retriever] kept top {len(chunks)} by Pinecone score")
     return {"retrieved_chunks": chunks, "scratchpad": log}
