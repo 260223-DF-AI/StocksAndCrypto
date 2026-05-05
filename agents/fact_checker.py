@@ -65,10 +65,11 @@ def _lazy_init():
     if _verdict_llm is None:
         _verdict_llm = ChatBedrock(
             model_id=os.environ.get(
-                "FACT_CHECK_MODEL_ID",
+                "FACT_CHECKER_MODEL_ID",
                 "anthropic.claude-3-haiku-20240307-v1:0",
             ),
             region_name=os.environ["AWS_REGION"],
+            provider="anthropic",
             model_kwargs={"max_tokens": 256, "temperature": 0.0},
         )
 

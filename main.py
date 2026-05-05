@@ -107,7 +107,7 @@ def main() -> None:
     if result.get("fact_check_report"):
         print("\nFACT-CHECK REPORT")
         for v in result["fact_check_report"]["verdicts"]:
-            print(f"  [{v['verdict']}] {v['claim'][:80]}")
+            print(f"  [{v['verdict']}] {v['claim']}")
 
 if __name__ == "__main__":
     main()
