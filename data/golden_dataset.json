@@ -63,19 +63,17 @@
     ]
   },
   {
-    "question": "What are the primary differences between X and Y?",
-    "ground_truth_answer": "X differs from Y in three key ways: ...",
+    "question": "What are Public Companies?",
+    "ground_truth_answer": "In the U.S. only companies registered with the SEC are considered public companies. This means that they can sell their shares on a public exchange like NYSE or Nasdaq.",
     "ground_truth_contexts": [
-      "Passage from document A that discusses X...",
-      "Passage from document B that discusses Y..."
+      "Not all companies can offer stock to the general public. In the U.S., only companies registered with the SEC can sell their shares on a public exchange like the NYSE or Nasdaq."
     ]
   },
   {
-    "question": "What are the primary differences between X and Y?",
-    "ground_truth_answer": "X differs from Y in three key ways: ...",
+    "question": "What is cryptocurrency?",
+    "ground_truth_answer": "A cryptocurrency is digit or virtual currency that is supposed to be a medium of exchange that has no physical form.",
     "ground_truth_contexts": [
-      "Passage from document A that discusses X...",
-      "Passage from document B that discusses Y..."
+      "A cryptocurrency is a digital or virtual currency that is meant to be a medium of exchange that does not have any physical manifestation."
     ]
   }
 ]
