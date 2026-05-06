@@ -14,32 +14,63 @@ Description: ResearchFlow — Adaptive Multi-Agent Research Assistant
 Globals:
   Function:
     Timeout: 120
-    MemorySize: 512
-    Runtime: python3.11
+    MemorySize: 2048
+    # Runtime is set by the image, not here, when using PackageType: Image.
+
+Parameters:
+  PineconeApiKey:
+    Type: String
+    NoEcho: true
+  PineconeIndexName:
+    Type: String
+    Default: researchflow
+  BedrockModelId:
+    Type: String
+    Default: anthropic.claude-opus-4-5-20251101-v1:0
+  EmbeddingModelId:
+    Type: String
+    Default: amazon.titan-embed-text-v2:0
+  HitlConfidenceThreshold:
+    Type: String
+    Default: "0.6"
+  MaxRefinementIterations:
+    Type: String
+    Default: "3"
 
 Resources:
-
   ResearchFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: app.lambda_handler
-      CodeUri: .
+      PackageType: Image
       Description: Handles /research POST requests
-      # TODO: Add environment variables from .env.example
-      # Environment:
-      #   Variables:
-      #     PINECONE_API_KEY: !Ref PineconeApiKey
-      #     BEDROCK_MODEL_ID: !Ref BedrockModelId
+      Environment:
+        Variables:
+          PINECONE_API_KEY: !Ref PineconeApiKey
+          PINECONE_INDEX_NAME: !Ref PineconeIndexName
+          BEDROCK_MODEL_ID: !Ref BedrockModelId
+          EMBEDDING_MODEL_ID: !Ref EmbeddingModelId
+          HITL_CONFIDENCE_THRESHOLD: !Ref HitlConfidenceThreshold
+          MAX_REFINEMENT_ITERATIONS: !Ref MaxRefinementIterations
+          AWS_REGION: !Ref AWS::Region
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - bedrock:InvokeModel
+                - bedrock:InvokeModelWithResponseStream
+              Resource: "*"
       Events:
         ResearchApi:
           Type: Api
           Properties:
             Path: /research
             Method: post
-
-  # TODO: Add any additional resources (e.g., IAM roles, DynamoDB for Store)
+    Metadata:
+      Dockerfile: Dockerfile
+      DockerContext: .
+      DockerTag: v1
 
 Outputs:
   ApiEndpoint:
-    Description: "API Gateway endpoint URL for the research endpoint"
+    Description: "API Gateway endpoint URL for /research"
     Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/research"

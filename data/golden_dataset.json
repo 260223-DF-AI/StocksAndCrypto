@@ -1,41 +1,37 @@
 [
   {
-    "question": "REPLACE with a research question relevant to your corpus.",
-    "ground_truth_answer": "REPLACE with the expected correct answer.",
+    "question": "When will the blockchain stop producing new bitcoins?",
+    "ground_truth_answer": "Since the bitcoin reward halves every ~210,000 blocks, the blockchain will stop producing new bitcoins around 2140.",
     "ground_truth_contexts": [
-      "REPLACE with the exact passage(s) from your corpus that support the answer."
+      "As the smallest possible fraction of a bitcoin is a satoshi, this means that when the reward is 1 satoshi and gets halved, it will be set to 0. At a rate of around 1 new block every 10 minutes, this will happen in roughly 2140."
     ]
   },
   {
-    "question": "What are the primary differences between X and Y?",
-    "ground_truth_answer": "X differs from Y in three key ways: ...",
+    "question": "What makes bitcoin different from other crypto currencies?",
+    "ground_truth_answer": "Bitcoin was the first successful cryptocurrency, and it is not owned by 1 particular company.",
     "ground_truth_contexts": [
-      "Passage from document A that discusses X...",
-      "Passage from document B that discusses Y..."
+      "Bitcoin was created anonymously by Satoshi Nakamoto. It is unique because it is not controlled by 1 particular entity, but rather by a global ledger of transactions."
     ]
   },
   {
-    "question": "What are the primary differences between X and Y?",
-    "ground_truth_answer": "X differs from Y in three key ways: ...",
+    "question": "How are stocks transferred?",
+    "ground_truth_answer": "Stocks are transferred between a buyer and a seller, usually with a broker that acts as intermediaries.",
     "ground_truth_contexts": [
-      "Passage from document A that discusses X...",
-      "Passage from document B that discusses Y..."
+      "Stocks are transferred between a buyer and a seller, usually with a broker that acts as intermediaries."
     ]
   },
   {
-    "question": "What are the primary differences between X and Y?",
-    "ground_truth_answer": "X differs from Y in three key ways: ...",
+    "question": "How is bitcoin mined?",
+    "ground_truth_answer": "Bitcoin is mined through a complex formula that takes a sizeable amount of computing power. It has a randomness to it, but the more computing power contributed, the better the chances of successfully mining a block.",
     "ground_truth_contexts": [
-      "Passage from document A that discusses X...",
-      "Passage from document B that discusses Y..."
+      "The blockchain is added to by many different mining nodes. When a miner finds a successful block, they upload it to the blockchain network, where other miners verify it is correct, then begin to build off of that one."
     ]
   },
   {
-    "question": "What are the primary differences between X and Y?",
-    "ground_truth_answer": "X differs from Y in three key ways: ...",
+    "question": "How does a company begin selling stocks?",
+    "ground_truth_answer": "The owners of a company can decide to go public and sell shares. They must be registered with the SEC.",
     "ground_truth_contexts": [
-      "Passage from document A that discusses X...",
-      "Passage from document B that discusses Y..."
+      "The owners of a company can decide to go public and sell shares. They must be registered with the SEC."
     ]
   },
   {
