@@ -47,19 +47,18 @@
     ]
   },
   {
-    "question": "What are the primary differences between X and Y?",
-    "ground_truth_answer": "X differs from Y in three key ways: ...",
+    "question": "What is the current stock price of AMD as of May 6th 2026?",
+    "ground_truth_answer": "The current stock price of AMD as of May 6th 2026 is $411.91.",
     "ground_truth_contexts": [
-      "Passage from document A that discusses X...",
-      "Passage from document B that discusses Y..."
+      "AMD's stock price as of May 6th 2026 is $411.91, according to the passage from AMD's Q1 2026 Earnings Report."
     ]
   },
   {
-    "question": "What are the primary differences between X and Y?",
-    "ground_truth_answer": "X differs from Y in three key ways: ...",
+    "question": "Who developed Bitcoin and how is it doing in the market as of Demeber 2025?",
+    "ground_truth_answer": "Bitcoin was developed by Satoshi Nakamoto in 2009. Bitcoin had its market cap falling by $413.3 bn over the quarter.",
     "ground_truth_contexts": [
-      "Passage from document A that discusses X...",
-      "Passage from document B that discusses Y..."
+      "Passage from How Cryptocurrency Works discusses that Bitcoin is the most commonly traded cryptocurrency and was the first cryptocurrency developed the currency was developed by Satoshi Nakamoto in 2009.",
+      "Passage from The cryptocurrency market in Q1 2026 discusses that Bitcoin was the main contributor to the decline in market capitalization, with its market cap falling by $413.3 bn (-23.7%) over the quarter."
     ]
   },
   {
