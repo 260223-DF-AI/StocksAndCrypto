@@ -66,7 +66,7 @@ def _lazy_init():
         _verdict_llm = ChatBedrock(
             model_id=os.environ.get(
                 "FACT_CHECKER_MODEL_ID",
-                "anthropic.claude-3-haiku-20240307-v1:0",
+                "anthropic.claude-sonnet-4-5-20250929-v1:0",
             ),
             region_name=os.environ["AWS_REGION"],
             provider="anthropic",

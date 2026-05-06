@@ -1,0 +1,12 @@
+FROM public.ecr.aws/lambda/python:3.11
+
+COPY ../requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the project — note SAM build runs from the deployment dir as CWD.
+COPY ../agents      ./agents
+COPY ../middleware  ./middleware
+COPY ../memory      ./memory
+COPY ../deployment/app.py ./app.py
+
+CMD ["app.lambda_handler"]
