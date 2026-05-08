@@ -35,11 +35,11 @@
     ]
   },
   {
-    "question": "What are the primary differences between X and Y?",
-    "ground_truth_answer": "X differs from Y in three key ways: ...",
+    "question": "What is an NFT and how does it differ from traditional forms of currency?",
+    "ground_truth_answer": "An NFT is a non-fungible token that can be seen as a unit of digital information stored on a blockchain. They typically contain references to digital assets such as art, music, or videos. They differ from traditional forms of currency because they are uniquely identifiable. They cannot be copied, substituted, or divided.",
     "ground_truth_contexts": [
-      "Passage from document A that discusses X...",
-      "Passage from document B that discusses Y..."
+      "A non-fungible token (NFT) is a unique digital identifier that is recorded on a blockchain and is used to certify ownership and authenticity. They typically contain references to digital files such as artworks, photos, videos and audio. Because NFTs are uniquely identifiable, they differ from cryptocurrencies (which are fungible, hence the name non-fungible token), and as a result they can't be copied, substituted, or subdivided.",
+      "For purposes of definition, a non-fungible token can be seen as a unit of digital information (token) that is stored on a blockchain and is not inherently interchangeable with other digital assets (non-fungible). The term 'fungible' derives from the economic and accounting literatures, and is defined as anything that is interchangeable with an identical or similar object. Traditional forms of currency, whether equivalent sums of paper money or identical units of precious metals, are fungible objects, and this is what helps them to serve as mediums of exchange, because they are understood to be of equal value."
     ]
   },
   {
