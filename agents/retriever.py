@@ -76,6 +76,7 @@ def _compress(chunk_text: str, query: str, max_sentences: int = 4) -> str:
 
 def _rerank_matches(query: str, matches: list[dict], top_k: int = 5) -> list[dict]:
     """Rerank Pinecone matches using Bedrock Cohere rerank."""
+    print("reranking begin")
     co = cohere.Client(api_key = os.environ["COHERE_API_KEY"])
     if not matches:
         return []
@@ -88,11 +89,12 @@ def _rerank_matches(query: str, matches: list[dict], top_k: int = 5) -> list[dic
         documents = documents,
         top_n = min(top_k, len(documents))
     )
+    print("got rerank model")
 
     results = rankings.results
     if not results:
         return matches[:top_k]
-    
+    print("got results")
     reranked = []
     for r in results[:top_k]:
         index = r.index
@@ -120,7 +122,7 @@ def retriever_node(state: ResearchState) -> dict:
     query_vec = _get_embedder().embed_query(sub_task)
     raw = index.query(
         vector=query_vec,
-        top_k=10,
+        top_k=5,
         namespace="primary-corpus",
         include_metadata=True,
     )
